@@ -86,32 +86,34 @@ const nodeList = computed(() => {
 </script>
 
 <template>
-  <div v-if="appStore.connectionError" class="alert px-4">
-    <NAlert type="error" title="RPC 服务错误" show-icon>
-      连接服务器失败，请检查网络设置或刷新页面后再试。
-    </NAlert>
-  </div>
-  <NodeGeneralCards />
-  <NDivider class="my-0! px-4!" dashed />
-  <div class="node-info p-4 flex flex-col gap-4">
-    <div class="search">
-      <NInput v-model:value="searchText" placeholder="搜索节点名称、地区、系统">
-        <template #prefix>
-          <div class="i-icon-park-outline-search" />
-        </template>
-      </NInput>
+  <div class="home-view">
+    <div v-if="appStore.connectionError" class="alert px-4">
+      <NAlert type="error" title="RPC 服务错误" show-icon>
+        连接服务器失败，请检查网络设置或刷新页面后再试。
+      </NAlert>
     </div>
-    <div class="nodes">
-      <NTabs v-model:value="appStore.nodeSelectedGroup" animated>
-        <NTabPane v-for="group in groups" :key="group.name" :tab="group.tab" :name="group.name">
-          <div v-if="nodeList.length !== 0" class="gap-4 grid grid-cols-1 lg:grid-cols-3 sm:grid-cols-2 xl:grid-cols-4">
-            <NodeCard v-for="node in nodeList" :key="node.uuid" :node="node" @click="router.push({ name: 'instance-detail', params: { id: node.uuid } })" />
-          </div>
-          <div v-else class="text-gray-500 text-center">
-            <NEmpty description="暂无节点" />
-          </div>
-        </NTabPane>
-      </NTabs>
+    <NodeGeneralCards />
+    <NDivider class="my-0! px-4!" dashed />
+    <div class="node-info p-4 flex flex-col gap-4">
+      <div class="search">
+        <NInput v-model:value="searchText" placeholder="搜索节点名称、地区、系统">
+          <template #prefix>
+            <div class="i-icon-park-outline-search" />
+          </template>
+        </NInput>
+      </div>
+      <div class="nodes">
+        <NTabs v-model:value="appStore.nodeSelectedGroup" animated>
+          <NTabPane v-for="group in groups" :key="group.name" :tab="group.tab" :name="group.name">
+            <div v-if="nodeList.length !== 0" class="gap-4 grid grid-cols-1 lg:grid-cols-3 sm:grid-cols-2 xl:grid-cols-4">
+              <NodeCard v-for="node in nodeList" :key="node.uuid" :node="node" @click="router.push({ name: 'instance-detail', params: { id: node.uuid } })" />
+            </div>
+            <div v-else class="text-gray-500 text-center">
+              <NEmpty description="暂无节点" />
+            </div>
+          </NTabPane>
+        </NTabs>
+      </div>
     </div>
   </div>
 </template>

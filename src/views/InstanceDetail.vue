@@ -59,133 +59,135 @@ const networkInfo = computed<InfoItem[]>(() => [
 </script>
 
 <template>
-  <!-- 节点不存在时的空状态 -->
-  <div v-if="!data" class="p-4">
-    <NCard>
-      <NEmpty description="节点不存在或已被删除">
-        <template #extra>
-          <NButton @click="router.push('/')">
-            返回首页
-          </NButton>
-        </template>
-      </NEmpty>
-    </NCard>
-  </div>
-
-  <!-- 节点详情 -->
-  <template v-else>
-    <!-- 头部信息 -->
-    <div class="px-4 py-2 flex gap-4 items-center">
-      <NButton text @click="router.push('/')">
-        <div class="i-icon-park-outline-arrow-left" />
-      </NButton>
-      <div class="text-lg font-bold flex gap-2 items-center">
-        <NIcon size="24">
-          <img :src="`/images/flags/${getRegionCode(data.region)}.svg`" :alt="getRegionDisplayName(data.region)">
-        </NIcon>
-        <NText>
-          {{ data.name }}
-        </NText>
-      </div>
-      <NTag :type="data.online ? 'success' : 'error'" size="small">
-        {{ data.online ? '在线' : '离线' }}
-      </NTag>
-      <!-- <NText :depth="3" class="text-xs">
-        {{ data.uuid }}
-      </NText> -->
+  <div class="instance-detail">
+    <!-- 节点不存在时的空状态 -->
+    <div v-if="!data" class="p-4">
+      <NCard>
+        <NEmpty description="节点不存在或已被删除">
+          <template #extra>
+            <NButton @click="router.push('/')">
+              返回首页
+            </NButton>
+          </template>
+        </NEmpty>
+      </NCard>
     </div>
 
-    <!-- 实例信息卡片 -->
-    <div class="p-4 gap-4 grid grid-cols-1 lg:grid-cols-2">
-      <!-- 硬件信息 -->
-      <NCard title="硬件信息" size="small">
-        <div class="gap-4 grid grid-cols-1 sm:grid-cols-2">
-          <div v-for="item in hardwareInfo" :key="item.label" class="flex flex-col gap-1">
-            <div class="flex gap-1 items-center">
-              <div v-if="item.icon" :class="item.icon" class="text-gray-400" />
-              <NText :depth="3" class="text-sm">
-                {{ item.label }}
-              </NText>
-            </div>
-            <NText class="text-sm break-all">
-              {{ item.value }}
-            </NText>
-          </div>
+    <!-- 节点详情 -->
+    <template v-else>
+      <!-- 头部信息 -->
+      <div class="px-4 py-2 flex gap-4 items-center">
+        <NButton text @click="router.push('/')">
+          <div class="i-icon-park-outline-arrow-left" />
+        </NButton>
+        <div class="text-lg font-bold flex gap-2 items-center">
+          <NIcon size="24">
+            <img :src="`/images/flags/${getRegionCode(data.region)}.svg`" :alt="getRegionDisplayName(data.region)">
+          </NIcon>
+          <NText>
+            {{ data.name }}
+          </NText>
         </div>
-      </NCard>
+        <NTag :type="data.online ? 'success' : 'error'" size="small">
+          {{ data.online ? '在线' : '离线' }}
+        </NTag>
+        <!-- <NText :depth="3" class="text-xs">
+          {{ data.uuid }}
+        </NText> -->
+      </div>
 
-      <!-- 系统信息 -->
-      <NCard title="系统信息" size="small">
-        <div class="gap-4 grid grid-cols-1 sm:grid-cols-2">
-          <div v-for="item in systemInfo" :key="item.label" class="flex flex-col gap-1">
-            <div class="flex gap-1 items-center">
-              <div v-if="item.icon" :class="item.icon" class="text-gray-400" />
-              <NText :depth="3" class="text-sm">
-                {{ item.label }}
-              </NText>
-            </div>
-            <div class="flex gap-2 items-center">
-              <NIcon v-if="item.label === '操作系统'" size="20">
-                <img :src="getOSImage(data.os)" :alt="getOSName(data.os)">
-              </NIcon>
+      <!-- 实例信息卡片 -->
+      <div class="p-4 gap-4 grid grid-cols-1 lg:grid-cols-2">
+        <!-- 硬件信息 -->
+        <NCard title="硬件信息" size="small">
+          <div class="gap-4 grid grid-cols-1 sm:grid-cols-2">
+            <div v-for="item in hardwareInfo" :key="item.label" class="flex flex-col gap-1">
+              <div class="flex gap-1 items-center">
+                <div v-if="item.icon" :class="item.icon" class="text-gray-400" />
+                <NText :depth="3" class="text-sm">
+                  {{ item.label }}
+                </NText>
+              </div>
               <NText class="text-sm break-all">
                 {{ item.value }}
               </NText>
             </div>
           </div>
-        </div>
-      </NCard>
+        </NCard>
 
-      <!-- 存储信息 -->
-      <NCard title="存储信息" size="small">
-        <div class="gap-4 grid grid-cols-1 sm:grid-cols-3">
-          <div v-for="item in storageInfo" :key="item.label" class="flex flex-col gap-1">
-            <div class="flex gap-1 items-center">
-              <div v-if="item.icon" :class="item.icon" class="text-gray-400" />
-              <NText :depth="3" class="text-sm">
-                {{ item.label }}
+        <!-- 系统信息 -->
+        <NCard title="系统信息" size="small">
+          <div class="gap-4 grid grid-cols-1 sm:grid-cols-2">
+            <div v-for="item in systemInfo" :key="item.label" class="flex flex-col gap-1">
+              <div class="flex gap-1 items-center">
+                <div v-if="item.icon" :class="item.icon" class="text-gray-400" />
+                <NText :depth="3" class="text-sm">
+                  {{ item.label }}
+                </NText>
+              </div>
+              <div class="flex gap-2 items-center">
+                <NIcon v-if="item.label === '操作系统'" size="20">
+                  <img :src="getOSImage(data.os)" :alt="getOSName(data.os)">
+                </NIcon>
+                <NText class="text-sm break-all">
+                  {{ item.value }}
+                </NText>
+              </div>
+            </div>
+          </div>
+        </NCard>
+
+        <!-- 存储信息 -->
+        <NCard title="存储信息" size="small">
+          <div class="gap-4 grid grid-cols-1 sm:grid-cols-3">
+            <div v-for="item in storageInfo" :key="item.label" class="flex flex-col gap-1">
+              <div class="flex gap-1 items-center">
+                <div v-if="item.icon" :class="item.icon" class="text-gray-400" />
+                <NText :depth="3" class="text-sm">
+                  {{ item.label }}
+                </NText>
+              </div>
+              <NText class="text-sm">
+                {{ item.value }}
               </NText>
             </div>
-            <NText class="text-sm">
-              {{ item.value }}
-            </NText>
           </div>
-        </div>
-      </NCard>
+        </NCard>
 
-      <!-- 网络信息 -->
-      <NCard title="网络信息" size="small">
-        <div class="gap-4 grid grid-cols-1 sm:grid-cols-2">
-          <div v-for="item in networkInfo" :key="item.label" class="flex flex-col gap-1">
-            <div class="flex gap-1 items-center">
-              <div v-if="item.icon" :class="item.icon" class="text-gray-400" />
-              <NText :depth="3" class="text-sm">
-                {{ item.label }}
+        <!-- 网络信息 -->
+        <NCard title="网络信息" size="small">
+          <div class="gap-4 grid grid-cols-1 sm:grid-cols-2">
+            <div v-for="item in networkInfo" :key="item.label" class="flex flex-col gap-1">
+              <div class="flex gap-1 items-center">
+                <div v-if="item.icon" :class="item.icon" class="text-gray-400" />
+                <NText :depth="3" class="text-sm">
+                  {{ item.label }}
+                </NText>
+              </div>
+              <NText class="text-sm break-all">
+                {{ item.value }}
               </NText>
             </div>
-            <NText class="text-sm break-all">
-              {{ item.value }}
-            </NText>
           </div>
-        </div>
-      </NCard>
-    </div>
+        </NCard>
+      </div>
 
-    <!-- 分割线 -->
-    <div>
-      <NDivider class="my-0! px-4!" dashed />
-    </div>
+      <!-- 分割线 -->
+      <div>
+        <NDivider class="my-0! px-4!" dashed />
+      </div>
 
-    <!-- 图表标签页 -->
-    <div class="p-4">
-      <NTabs v-model:value="chartView" type="segment" animated>
-        <NTabPane name="load" tab="负载">
-          <LoadChart :uuid="data.uuid" />
-        </NTabPane>
-        <NTabPane name="ping" tab="延迟">
-          <PingChart :uuid="data.uuid" />
-        </NTabPane>
-      </NTabs>
-    </div>
-  </template>
+      <!-- 图表标签页 -->
+      <div class="p-4">
+        <NTabs v-model:value="chartView" type="segment" animated>
+          <NTabPane name="load" tab="负载">
+            <LoadChart :uuid="data.uuid" />
+          </NTabPane>
+          <NTabPane name="ping" tab="延迟">
+            <PingChart :uuid="data.uuid" />
+          </NTabPane>
+        </NTabs>
+      </div>
+    </template>
+  </div>
 </template>
