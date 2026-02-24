@@ -28,8 +28,20 @@ onMounted(async () => {
     </Transition>
 
     <Header />
-    <main v-if="!appStore.loading" class="min-h-screen">
-      <RouterView />
+    <main v-if="!appStore.loading" class="min-h-screen overflow-hidden">
+      <RouterView v-slot="{ Component }">
+        <Transition
+          enter-active-class="transition-all duration-200 ease-out"
+          enter-from-class="opacity-0 translate-x-4 blur-sm"
+          enter-to-class="opacity-100 translate-x-0 blur-0"
+          leave-active-class="transition-all duration-200 ease-in"
+          leave-from-class="opacity-100 translate-x-0 blur-0"
+          leave-to-class="opacity-0 -translate-x-4 blur-sm"
+          mode="out-in"
+        >
+          <component :is="Component" />
+        </Transition>
+      </RouterView>
     </main>
     <Footer v-if="!appStore.loading" />
   </Provider>
