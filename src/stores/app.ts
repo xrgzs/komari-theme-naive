@@ -15,6 +15,7 @@ const useAppStore = defineStore('app', () => {
   const nodeSelectedGroup = ref<string>(localStorage.getItem('nodeSelectedGroup') || 'all')
   const nodeViewMode = ref<NodeViewMode>((localStorage.getItem('nodeViewMode') as NodeViewMode) || 'grid')
   const isLoggedIn = ref<boolean>(false)
+  const connectionError = ref<boolean>(false)
 
   // 监听分组选择变化，自动保存到 localStorage
   watch(nodeSelectedGroup, (newValue) => {
@@ -69,6 +70,7 @@ const useAppStore = defineStore('app', () => {
     isLoggedIn,
     userInfo,
     publicSettings,
+    connectionError,
     updateThemeMode,
     updateLang,
     setUserInfo,

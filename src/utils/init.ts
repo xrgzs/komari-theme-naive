@@ -19,6 +19,8 @@ interface InitConfig {
   pollInterval?: number
   /** 后端健康检查超时（毫秒） */
   healthCheckTimeout?: number
+  /** POST 模式连续失败次数阈值 */
+  postFailureThreshold?: number
 }
 
 const DEFAULT_CONFIG: Required<InitConfig> = {
@@ -26,6 +28,7 @@ const DEFAULT_CONFIG: Required<InitConfig> = {
   wsMaxReconnectAttempts: 5,
   pollInterval: 1000,
   healthCheckTimeout: 5000,
+  postFailureThreshold: 3,
 }
 
 /** 初始化状态管理 */
@@ -38,6 +41,7 @@ class InitManager {
   private isPolling = false
   private isInitialized = false
   private useWebSocket = true
+  private postFailureCount = 0
 
   constructor(config: InitConfig = {}) {
     this.config = { ...DEFAULT_CONFIG, ...config }
@@ -96,6 +100,7 @@ class InitManager {
     }
     catch (error) {
       console.error('[InitManager] Health check failed:', error)
+      this.appStore.connectionError = true
       throw new Error('Backend service unavailable')
     }
   }
@@ -303,6 +308,9 @@ class InitManager {
 
       // 更新节点状态
       this.nodesStore.updateNodeStatuses(statusesResult)
+
+      // 重置失败计数
+      this.postFailureCount = 0
     }
     catch (error) {
       if (error instanceof RpcError) {
@@ -310,6 +318,15 @@ class InitManager {
       }
       else {
         console.error('[InitManager] Poll error:', error)
+      }
+
+      // POST 模式下累计失败次数
+      if (!this.useWebSocket) {
+        this.postFailureCount++
+        if (this.postFailureCount >= this.config.postFailureThreshold) {
+          console.error('[InitManager] POST mode failed repeatedly, setting connectionError')
+          this.appStore.connectionError = true
+        }
       }
     }
     finally {
