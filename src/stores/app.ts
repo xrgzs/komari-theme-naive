@@ -1,10 +1,10 @@
 import type { MeInfo, PublicSettings } from '@/utils/api'
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 type ThemeMode = 'auto' | 'light' | 'dark'
 type Lang = 'zh-CN' | 'en-US'
-type NodeViewMode = 'grid' | 'table'
+type NodeViewMode = 'card' | 'list'
 
 const useAppStore = defineStore('app', () => {
   const loading = ref<boolean>(true)
@@ -13,9 +13,31 @@ const useAppStore = defineStore('app', () => {
   const publicSettings = ref<PublicSettings>()
   const userInfo = ref<MeInfo>()
   const nodeSelectedGroup = ref<string>(localStorage.getItem('nodeSelectedGroup') || 'all')
-  const nodeViewMode = ref<NodeViewMode>((localStorage.getItem('nodeViewMode') as NodeViewMode) || 'grid')
   const isLoggedIn = ref<boolean>(false)
   const connectionError = ref<boolean>(false)
+
+  // 从 localStorage 读取视图模式，若无则从主题配置获取默认值
+  const getDefaultViewMode = (): NodeViewMode => {
+    const stored = localStorage.getItem('nodeViewMode')
+    if (stored === 'card' || stored === 'list') {
+      return stored
+    }
+    return 'card'
+  }
+
+  const nodeViewMode = ref<NodeViewMode>(getDefaultViewMode())
+
+  // 计算属性：从主题配置获取默认视图模式
+  const defaultViewMode = computed<NodeViewMode>(() => {
+    const settings = publicSettings.value?.theme_settings
+    if (settings && typeof settings.defaultViewMode === 'string') {
+      const mode = settings.defaultViewMode
+      if (mode === 'card' || mode === 'list') {
+        return mode
+      }
+    }
+    return 'card'
+  })
 
   // 监听主题模式变化，自动保存到 localStorage
   watch(themeMode, (newValue) => {
@@ -72,6 +94,7 @@ const useAppStore = defineStore('app', () => {
     lang,
     nodeSelectedGroup,
     nodeViewMode,
+    defaultViewMode,
     isLoggedIn,
     userInfo,
     publicSettings,

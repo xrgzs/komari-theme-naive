@@ -20,7 +20,7 @@ const diskStatus = computed(() => getStatus(diskPercentage.value))
 </script>
 
 <template>
-  <NCard hoverable class="w-full cursor-pointer">
+  <NCard hoverable class="node-card w-full cursor-pointer">
     <template #header>
       <div class="flex gap-2 items-center">
         <NIcon>

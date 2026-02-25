@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { NAlert, NDivider, NEmpty, NInput, NTabPane, NTabs } from 'naive-ui'
+import { NAlert, NDivider, NEmpty, NInput, NRadioButton, NRadioGroup, NTabPane, NTabs } from 'naive-ui'
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import NodeCard from '@/components/NodeCard.vue'
 import NodeGeneralCards from '@/components/NodeGeneralCards.vue'
+import NodeList from '@/components/NodeList.vue'
 import { useAppStore } from '@/stores/app'
 import { useNodesStore } from '@/stores/nodes'
 import { isRegionMatch } from '@/utils/regionHelper'
@@ -83,6 +84,10 @@ const nodeList = computed(() => {
 
   return filteredNodes
 })
+
+function handleNodeClick(node: typeof nodesStore.nodes[number]) {
+  router.push({ name: 'instance-detail', params: { id: node.uuid } })
+}
 </script>
 
 <template>
@@ -95,19 +100,31 @@ const nodeList = computed(() => {
     <NodeGeneralCards />
     <NDivider class="my-0! px-4!" dashed />
     <div class="node-info p-4 flex flex-col gap-4">
-      <div class="search">
+      <div class="search flex gap-2 items-center">
         <NInput v-model:value="searchText" placeholder="搜索节点名称、地区、系统">
           <template #prefix>
             <div class="i-icon-park-outline-search" />
           </template>
         </NInput>
+        <NRadioGroup v-model:value="appStore.nodeViewMode">
+          <NRadioButton value="card">
+            Card
+          </NRadioButton>
+          <NRadioButton value="list">
+            List
+          </NRadioButton>
+        </NRadioGroup>
       </div>
       <div class="nodes">
         <NTabs v-model:value="appStore.nodeSelectedGroup" animated>
           <NTabPane v-for="group in groups" :key="group.name" :tab="group.tab" :name="group.name">
-            <div v-if="nodeList.length !== 0" class="gap-4 grid grid-cols-1 lg:grid-cols-3 sm:grid-cols-2 xl:grid-cols-4">
-              <NodeCard v-for="node in nodeList" :key="node.uuid" :node="node" @click="router.push({ name: 'instance-detail', params: { id: node.uuid } })" />
+            <!-- Card 视图 -->
+            <div v-if="nodeList.length !== 0 && appStore.nodeViewMode === 'card'" class="gap-4 grid grid-cols-1 lg:grid-cols-3 sm:grid-cols-2 xl:grid-cols-4">
+              <NodeCard v-for="node in nodeList" :key="node.uuid" :node="node" @click="handleNodeClick(node)" />
             </div>
+            <!-- List 视图 -->
+            <NodeList v-else-if="nodeList.length !== 0 && appStore.nodeViewMode === 'list'" :nodes="nodeList" @click="handleNodeClick" />
+            <!-- 空状态 -->
             <div v-else class="text-gray-500 text-center">
               <NEmpty description="暂无节点" />
             </div>
